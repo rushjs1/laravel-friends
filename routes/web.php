@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FriendIndexController;
 use App\Http\Controllers\ProfileIndexController;
 use App\Http\Controllers\FriendStoreController;
+use App\Http\Controllers\FriendDestroyController;
+use App\Http\Controllers\FriendPatchController;
+use App\Http\Controllers\DashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,15 +23,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth'])->name('dashboard');
 
 Route::get('/friends', FriendIndexController::class)->name('friends');
 Route::post('/friends/{user}', FriendStoreController::class)->name('friends.store');
-
 Route::get('/profile/{user}', ProfileIndexController::class)->name('profile');
-
+Route::delete('/friends/{user}', FriendDestroyController::class)->name('friends.destroy');
+Route::patch('/friends/{user}', FriendPatchController::class)->name('friends.patch');
 
 
 

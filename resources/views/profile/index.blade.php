@@ -11,30 +11,85 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     @auth
 
-                    @if(auth()->user()->hasPendingFriendRequestFor($user))
+                    @if(auth()->user()->id !== $user->id)
 
-                    <div class="space-x-1">
-                      <span>
-                      Waiting for {{ $user->name }} to accept your friend request.
-                      </span> 
-                      <form action="" method="POST" class="inline">
-                          @csrf
-                          <button class="text-indigo-500">Cancel</button>
-                      </form>
-                    </div>
+                    @if(auth()->user()->isFriendsWith($user))
 
-                    @else
+                        <div class="space-x-2">
+                            <span> You and {{ $user->name }} are friends. </span>
+                            <form action="/friends/{{$user->id}}" method="POST" class="inline">
+                                @csrf 
+                                @method('DELETE')
+                                <button type="submit" class="hover:underline hover:text-rose-500">
+                                    Unfriend
+                                </button>
+                            </form>
+                        </div>
 
-                    <form action="{{ route('friends.store', $user) }}" method="POST">
-                        @csrf
+                        @else
 
-                        <button class="font-semibold bg-gray-100 rounded-lg p-2 text-indigo-500 hover:bg-gray-200 shadow-sm">
-                            Add As Friend
-                        </button>
+                        @if(auth()->user()->hasPendingFriendRequestFor($user))
 
-                    </form>
+                            <div class="space-x-1">
+                            <span>
+                            Waiting for {{ $user->name }} to accept your friend request.
+                            </span> 
+                            <form action="{{ route('friends.destroy', $user) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button class="text-indigo-500">Cancel</button>
+                            </form>
+                            </div>
 
-                    @endif
+                            @elseif($user->hasPendingFriendRequestFor(auth()->user()))
+
+                            <div class="flex justify-between items-center">
+                                <span>
+                                    {{ $user->name }} has sent you a friend request. 
+                                </span>
+
+                                <div class="space-x-2">
+                                <form action="/friends/{{$user->id}}" method="POST" class="inline">
+                                    @csrf 
+                                    @method('PATCH')
+                                    <button type="submit" class="hover:underline hover:text-green-500">Accept</button>
+                                </form>
+
+                                <form action="/friends/{{ $user->id}}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="hover:underline hover:text-rose-500">Reject</button>
+
+                                </form>
+                                </div>
+                            
+                            
+                            </div>
+
+                            @else
+
+                            <form action="{{ route('friends.store', $user) }}" method="POST">
+                                @csrf
+
+                                <button class="font-semibold bg-gray-100 rounded-lg p-2 text-indigo-500 hover:bg-gray-200 shadow-sm">
+                                    Add As Friend
+                                </button>
+
+                            </form>
+
+                            @endif
+
+                        @endif
+
+                        @else
+                         
+                        <div>
+                            <span>
+                                Your Profile.
+                            </span>
+                        </div>
+
+                        @endif
 
                     @endauth
                 </div>

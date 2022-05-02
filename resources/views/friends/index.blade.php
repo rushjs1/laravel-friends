@@ -15,19 +15,24 @@
                           Friends 
                        </h2>
                        <div class="space-y-3">
+                           @forelse($friends as $friend)
                           <div class="flex items-center justify-between">
 
-                            <a href="#">
-                                Friend
+                            <a href="{{ route('profile', $friend) }}">
+                                {{ $friend->name }}
                             </a>
                             <div class="space-x-2">
-                                <button>
-                                    Unfriend
-                                </button>
-                                
+                                <form action="{{ route('friends.destroy', $friend) }}" method="POST" class="inline">
+                                    @csrf 
+                                    @method('DELETE')
+                                    <button type="submit" class="hover:underline hover:text-rose-500">Unfriend</button>
+                                </form>
                             </div>
                           </div>  
-                          
+                          @empty
+                            <span> You have no friends. </span>
+                          @endforelse
+
                        </div>
                    </div>
                 </div>
@@ -42,21 +47,30 @@
                           Friend Requests 
                        </h2>
                        <div class="space-y-3">
+                           @forelse($pendingFriendsFrom as $pendingFriendFrom)
                           <div class="flex items-center justify-between">
 
-                            <a href="#">
-                                Friend
+                            <a href="{{ route('profile', $pendingFriendFrom) }}">
+                                {{ $pendingFriendFrom->name }}
                             </a>
                             <div class="space-x-2">
-                                <button>
-                                    Accept
-                                </button>
-                                <button>
-                                    Reject
-                                </button>
+                                <form action="{{ route('friends.patch', $pendingFriendFrom) }}" method="POST" class="inline">
+                                    @csrf 
+                                    @method('PATCH')
+                                    <button class="hover:underline hover:text-green-500">Accept</button>
+                                </form>
+                                <form action="{{ route('friends.destroy', $pendingFriendFrom) }}" method="POST" class="inline">
+                                    @csrf 
+                                    @method('DELETE')
+                                    <button class="hover:text-rose-500 hover:underline" >Reject</button>
+                                </form>
                             </div>
                           </div>  
-                          
+                            @empty
+                            <div class="bg-gray-100 rounded-md w-full text-center p-2">
+                                <span>You have no friend requests. </span>
+                            </div>
+                            @endforelse
                        </div>
                    </div>
                    <div class="space-y-3">
@@ -64,17 +78,26 @@
                         Pending Friend Requests 
                        </h2>
                        <div class="space-y-3">
+                           @forelse($pendingFriendsTo as $pendingFriendTo)
                           <div class="flex items-center justify-between">
 
-                            <a href="#">
-                                Friend
+                            <a href=" {{ route('profile', $pendingFriendTo) }} ">
+                                {{$pendingFriendTo->name}}
                             </a>
                             <div class="space-x-2">
-                                <button>
-                                    Cancel
-                                </button>
+                                <form action="{{ route('friends.destroy', $pendingFriendTo) }}" method="POST" class="inline">
+                                    @csrf 
+                                    @method('DELETE')
+                                    <button class="text-indigo-600 hover:underline">Cancel</button>
+                                </form>
                             </div>
                           </div>  
+                          @empty 
+                          <div class="bg-gray-100 rounded-md w-full text-center p-2">
+                          <span>You have no pending friend Request</span>
+                          </div>
+                        
+                          @endforelse
                           
                        </div>
                    </div>

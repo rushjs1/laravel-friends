@@ -7,10 +7,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use \Staudenmeir\LaravelMergedRelations\Eloquent\HasMergedRelationships;
+use \Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use App\Models\Status;
+
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+    use HasMergedRelationships;
+    use HasRelationships;
+
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +54,11 @@ class User extends Authenticatable
         return $this->pendingFriendsTo->contains($user);
     }
 
+    public function isFriendsWith(User $user) 
+    {
+        return $this->friends->contains($user);
+    }
+
     public function friendsTo()
     {
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
@@ -68,7 +80,7 @@ class User extends Authenticatable
     }
     public function pendingFriendsFrom()
     {
-        return $this->friendFrom()->wherePivot('accepted', false);
+        return $this->friendsFrom()->wherePivot('accepted', false);
     }
 
     public function acceptedFriendsTo()
@@ -79,5 +91,21 @@ class User extends Authenticatable
     public function acceptedFriendsFrom()
     {
         return $this->friendsFrom()->wherePivot('accepted', true);
+    }
+
+    public function friends()
+    {
+        return $this->mergedRelationWithModel(User::class, 'friends_view');
+    }
+
+    public function statuses()
+    {
+        return $this->hasMany(Status::class);
+    }
+
+    public function friendsStatuses()
+    {
+        return $this->hasManyDeepFromRelations($this->friends(), (new User())->statuses())
+                    ->latest();
     }
 }
